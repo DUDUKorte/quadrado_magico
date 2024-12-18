@@ -4,7 +4,7 @@
 // Variaveis Globais
 int **MATRIX; // Matriz em tempo real com os valores
 int **MATRIX_TEMPLATE; // Matriz de 0 e 1 que determina se o numero ixj esta na posicao correta ou nao
-int INIT_POS, MARGIN_SIZE, SIZE_X, SIZE_Y, MATRIX_POINTS = 0; // variaveis globais para as configuracoes do tabuleiro
+int INIT_POS, MARGIN_SIZE, SIZE_X, SIZE_Y, MATRIX_POINTS = 0, MVT_COUNTER = 0; // variaveis globais para as configuracoes do tabuleiro
 int PLAYER_X, PLAYER_Y, PLAYER_POINTS = 0, PLAYER_IS_DEAD = 0; // Variaveis globais do jogador
 char PLAYER[] = "\u25A0"; // Icone do jogador em unicode (3 caracteres)
 
@@ -136,7 +136,9 @@ void create_window(){
 
     printf(RESET "\n");
     printf("\n\n");
-    printf("PLAYER_POINTS = %d\n", PLAYER_POINTS);
+    printf(FG_GREEN BOLD);
+    printf("TOTAL MOVEMENTS: %d\n", MVT_COUNTER);
+    printf(RESET);
 }
 
 /* Handle movement actions */
@@ -189,6 +191,7 @@ void _move_up(){
     MATRIX[PLAYER_Y][PLAYER_X] = MATRIX[PLAYER_Y+1][PLAYER_X];
     MATRIX[PLAYER_Y+1][PLAYER_X] = 0;
     PLAYER_Y++;
+    MVT_COUNTER += 1;
 
 }
 void _move_down(){
@@ -199,6 +202,7 @@ void _move_down(){
     MATRIX[PLAYER_Y][PLAYER_X] = MATRIX[PLAYER_Y-1][PLAYER_X];
     MATRIX[PLAYER_Y-1][PLAYER_X] = 0;
     PLAYER_Y--;
+    MVT_COUNTER += 1;
 
 }
 void _move_left(){
@@ -209,6 +213,7 @@ void _move_left(){
     MATRIX[PLAYER_Y][PLAYER_X] = MATRIX[PLAYER_Y][PLAYER_X+1];
     MATRIX[PLAYER_Y][PLAYER_X+1] = 0;
     PLAYER_X++;
+    MVT_COUNTER += 1;
 
 }
 void _move_right(){
@@ -219,6 +224,7 @@ void _move_right(){
     MATRIX[PLAYER_Y][PLAYER_X] = MATRIX[PLAYER_Y][PLAYER_X-1];
     MATRIX[PLAYER_Y][PLAYER_X-1] = 0;
     PLAYER_X--;
+    MVT_COUNTER += 1;
 
 }
 
@@ -282,6 +288,7 @@ void randomize_matrix(){
 
       handle_movement(movements[movement_choice]);
     }
+    MVT_COUNTER = 0;
 
 }
 
