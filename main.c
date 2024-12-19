@@ -25,7 +25,7 @@ int start_game(int x, int y) {
         create_window();
 
         // Prints ao final da janela
-        printf("Press F to Exit\n");
+        printf("Press F to Give Up\n");
 
         if (on_player_win()) {
             for (int i = 5; i > 0; i--) {
