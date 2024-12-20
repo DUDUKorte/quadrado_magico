@@ -32,16 +32,14 @@ void start(int x, int y, int init_pos, int margin_size){ // Inicializa tudo nece
 
     // Create Window First time
     create_window();
+    PLAYER_IS_DEAD = 0;
 }
 
 /* Show original matrixz before randomize */
 void show_original_matrix(int wait_time){
-    for(int i = wait_time; i > 0; i--){
-        create_window();
-        printf("STARTING IN... %d\n", i);
-
-        usleep(1000000); // Wait 1 second each loop
-    }
+    create_window();
+    printf("PRESS ANY KEY...\n");
+    char pressed_key = getch();
 }
 
 /* Cria janela do jogo */
@@ -56,53 +54,48 @@ void create_window(){
 
     printf(BG_BLACK FG_WHITE BOLD);
 
-    // print top lines
-    gotoxy(xl+1, ys);
-    for(int i = xl+1; i < xd; i++){
-        char formatted_[10];
-        _formatar_opcao("", formatted_, MARGIN_SIZE+1, "-");
-        printf("%s", formatted_);
-    }
+    // Format Margin simbols
     char _plus_formatted[4];
     _format_margin_side("+", _plus_formatted, MARGIN_SIZE);
-    printf("%s", _plus_formatted);
+
+    char formatted_margin[8];
+    _formatar_opcao("", formatted_margin, MARGIN_SIZE+1, "-");
+
+    char side_formatted[4];
+    _format_margin_side("|", side_formatted, MARGIN_SIZE);
+
+    // print top/bottom lines
+    for(int i = xl+1; i < xd+((SIZE_X-1)*MARGIN_SIZE); i+=MARGIN_SIZE+1){
+      	gotoxy(i, ys);
+        printf("%s", formatted_margin);
+        gotoxy(i, yi);
+        printf("%s", formatted_margin);
+    }
 
     // print lateral lines
     for(int i = ys+1; i < yi+1; i++){
         gotoxy(xl-2, i);
-        char formatted_[4];
-        _format_margin_side("|", formatted_, MARGIN_SIZE);
-        printf("%s", formatted_);
-        for(int i = xl+1; i < xd; i++){
-            char formatted_[10];
-            _formatar_opcao("", formatted_, MARGIN_SIZE+1, "");
-            printf("%s", formatted_);
-        }
+        printf("%s", side_formatted);
 
-        printf("%s", formatted_);
+		gotoxy(xd+(SIZE_X*MARGIN_SIZE), i);
+        printf("%s", side_formatted);
     }
 
-    // print bottom lines
-    gotoxy(xl+1, yi);
-    for(int i = xl+1; i < xd; i++){
-        char formatted_[10];
-        _formatar_opcao("", formatted_, MARGIN_SIZE+1, "-");
-        printf("%s", formatted_);
-    }
-    printf("%s", _plus_formatted);
-
-    // Print margins
+    // Print corner margins
     gotoxy(xl-2, ys);
     printf("%s", _plus_formatted);
     gotoxy(xl-2, yi);
     printf("%s", _plus_formatted);
+    gotoxy(xd+(SIZE_X*MARGIN_SIZE), ys);
+    printf("%s", _plus_formatted);
+    gotoxy(xd+(SIZE_X*MARGIN_SIZE), yi);
+    printf("%s", _plus_formatted);
 
     // Criar números
-    int i_m = 0, j_m = 0;
+    int i_m = 0, j_m = 0; // index i e j da matriz
     for(int i = ys+1; i < yi; i++){
             gotoxy(xl+1, i);
         for(int j = xl+1; j < xd; j++){
-            //for(int i = 0; i < max_digits; i++){ printf(" ");}
             printf(BG_RED FG_GREEN BOLD);
             int num = MATRIX[i_m][j_m];
 
@@ -112,20 +105,20 @@ void create_window(){
 
             _format_num(num == 0 ? PLAYER : s_num, formatted_num, MARGIN_SIZE);
 
-            if(num == 0){ // [e o player
+            if(num == 0){ // is the player
                 printf("%s| %s |",BG_PLAYER FG_PLAYER BOLD, formatted_num);
                 MATRIX_TEMPLATE[i_m][j_m] = 0; // Marca ponto como local do player
-            }else if(num == j_m+1 + (SIZE_X * i_m)){ // se for o n[umero certo na matrix
+            }else if(num == j_m+1 + (SIZE_X * i_m)){ // se for o numero certo na matrix
                 printf("%s|%s|", BG_WHITE_2 FG_GREEN BOLD, formatted_num);
                 MATRIX_TEMPLATE[i_m][j_m] = 1; // Marca ponto como correto
-            }else{ // n[umero no lugar errado da matrix
+            }else{ // numero no lugar errado da matrix
             	printf("|%s|", formatted_num);
                 MATRIX_TEMPLATE[i_m][j_m] = 0; // Marca ponto como errado
             }
 
             PLAYER_POINTS += 1 * MATRIX_TEMPLATE[i_m][j_m]; // Contabiliza os pontos
 
-            if(num == size_x*size_y){
+            if(num == size_x*size_y){ // Chegou no ultimo numero da matriz
                 break;
             }
             j_m++;
@@ -134,10 +127,10 @@ void create_window(){
         j_m = 0;
     }
 
-    printf(RESET "\n");
-    printf("\n\n");
-    printf(FG_GREEN BOLD);
-    printf("TOTAL MOVEMENTS: %d\n", MVT_COUNTER);
+    // Prints ao final da janela
+    printf(RESET "\n\n");
+    printf(FG_GREEN BOLD "TOTAL MOVEMENTS: %d\n", MVT_COUNTER);
+    printf("Press F to Give Up\n");
     printf(RESET);
 }
 
@@ -261,32 +254,38 @@ void _create_matrix(int x, int y){
 }
 
 void randomize_matrix(){
-	srand(time(NULL));
-	char movements[4] = {'w', 'a', 's', 'd'};
-    int qtd_movements[4] = {0};
+	srand(time(NULL)); // Randomize seed
+	char movements[4] = {'w', 'a', 's', 'd'}; // possible movements
+    int qtd_movements[4] = {0}; // how many movements made with i key
 	int min, max;
     min = SIZE_X*SIZE_Y*3;
     max = SIZE_X*SIZE_Y*5;
 
-    int num = rand() % (max - min + 1) + min;
-    printf("RANDOM NUMBER: %d\n", num);
+    int num = rand() % (max - min + 1) + min; // select random numver of movements
+    //printf("RANDOM NUMBER: %d\n", num);
 
+    char tmp_movement = ' ';
 
     for(int i = 0; i < num; i++){
-      int movement_choice = rand() % 4;
-      qtd_movements[movement_choice] += 1;
+      int movement_choice = rand() % 4; // choose a movement
+      qtd_movements[movement_choice] += 1; // add movement to i key
 
+      if(movement_choice != tmp_movement){ // Caso tenha mudado a tecla antes de fazer 3 movimentos seguidos
+        qtd_movements[tmp_movement] = 0;
+      }
+
+      // Algoritmo para evitar fazer mais de 3 movimentos iguais seguidos
       if(qtd_movements[movement_choice] > 3){
-        char tmp_movement = movement_choice;
 		do{
 			movement_choice = rand() % 4;
 			if(!(movement_choice == tmp_movement)){
             	qtd_movements[tmp_movement] = 0;
 			}
-		}while(qtd_movements[movement_choice] > 3);
+		}while(qtd_movements[movement_choice] > 3); // Escolhe um numero aleatorio ate ser um diferente do anterior
       }
 
       handle_movement(movements[movement_choice]);
+      tmp_movement = movement_choice;
     }
     MVT_COUNTER = 0;
 
