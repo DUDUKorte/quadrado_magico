@@ -73,7 +73,7 @@ int _mostrar_options(const char *opcoes[], int n, const char *titulo, int *varia
          _formatar_variavel(opcoes[i], opcao_formatada, MENU_WIDTH, variaveis[i]);
 
          if (i == selecionado) {
-            printf(BG_BBLACK FG_GREEN " %s " RESET "\n", opcao_formatada); // Destaca a opção com vídeo reverso
+            printf(BG_BBLACK FG_GREEN " %s " RESET " 🢠 🢡\n", opcao_formatada); // Destaca a opção com vídeo reverso
          } else {
             printf(BG_BLACK FG_WHITE " %s\n" RESET, opcao_formatada);
          }
@@ -157,6 +157,7 @@ int start_menu() {
       }else{
          break;
       }
+
    }
 
    return 0;

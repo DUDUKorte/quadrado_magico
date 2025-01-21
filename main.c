@@ -13,7 +13,19 @@ int start_game(int x, int y) {
     char line[1] = "";
 
     clrscr();
-    start(size_x, size_y, init_pos, margin_size);
+    int start_failure = start(size_x, size_y, init_pos, margin_size);
+    
+    if(start_failure){
+        for (int i = 5; i > 0; i--) {
+            clrscr();
+            printf(BG_RED "An unexpected error ocurred. Please, try again later.\n" RESET);
+            printf("Returning back to menu in... %d\n", i);
+            usleep(1000000);
+        }
+
+        close_game();
+        return 0;
+    }
 
     fflush(stdin); // Limpa o buffer para evitar carregar teclas pressionadas no menu ou no start
 

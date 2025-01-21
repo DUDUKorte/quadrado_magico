@@ -11,7 +11,7 @@ char PLAYER[] = "\u25A0"; // Icone do jogador em unicode (3 caracteres)
 // Funções Do Jogo Principal -----------------------------------------------------------------------
 
 /* Start function */
-void start(int x, int y, int init_pos, int margin_size){ // Inicializa tudo necessario para comecar o jogo
+int start(int x, int y, int init_pos, int margin_size){ // Inicializa tudo necessario para comecar o jogo
 
     // Variaveis globais
     SIZE_X = x;
@@ -22,7 +22,12 @@ void start(int x, int y, int init_pos, int margin_size){ // Inicializa tudo nece
 
     // Generate Matrix
     // Save Matrix
-    _create_matrix(x, y);
+    int allocation_failure = _create_matrix(x, y); // Retorna True(1) se houver erros
+
+    if(allocation_failure){
+        // INTERROMPER INICIALIZAÇÃO
+        return 1;
+    }
 
     // Show Original Matrix before randomize
     show_original_matrix(5);
@@ -33,6 +38,8 @@ void start(int x, int y, int init_pos, int margin_size){ // Inicializa tudo nece
     // Create Window First time
     create_window();
     PLAYER_IS_DEAD = 0;
+
+    return 0; // NENHUM ERRO
 }
 
 /* Show original matrixz before randomize */
@@ -222,17 +229,31 @@ void _move_right(){
 }
 
 /* Matrix Functions */
-void _create_matrix(int x, int y){
+int _create_matrix(int x, int y){
     // Cria o ponteiro para a matrix dependendo do tamanho dela
     MATRIX = (int **)malloc(sizeof (int*) * y);
+    if(!MATRIX){
+        // ERRO NA ALOCAÇÃO
+        return 1;
+    }
     for (int i = 0; i < y; i++) {
         MATRIX[i] = (int *)malloc(sizeof (int) * x);
+        if(!MATRIX[i]){
+            // ERRO NA ALOCAÇÃO
+            return 1;
+        }
     }
 
     // Cria o ponteiro para a matrix template dependendo do tamanho dela
     MATRIX_TEMPLATE = (int **)malloc(sizeof (int*) * y);
+    if(!MATRIX_TEMPLATE){
+        return 1;
+    }
     for (int i = 0; i < y; i++) {
         MATRIX_TEMPLATE[i] = (int *)malloc(sizeof (int) * x);
+        if(!MATRIX_TEMPLATE[i]){
+            return 1;
+        }
     }
 
     // Default Matrix values
@@ -251,6 +272,7 @@ void _create_matrix(int x, int y){
         }
     }
 
+    return 0;
 }
 
 void randomize_matrix(){

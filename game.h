@@ -1,7 +1,7 @@
 // Funções Do Jogo Principal -----------------------------------------------------------------------
 
 /* Start function */
-void start(int x, int y, int init_pos, int margin_size);
+int start(int x, int y, int init_pos, int margin_size);
 
 /* Show original matrixz before randomize */
 void show_original_matrix(int wait_time);
@@ -19,7 +19,7 @@ void _move_left();
 void _move_right();
 
 /* Matrix Functions */
-void _create_matrix(int x, int y);
+int _create_matrix(int x, int y);
 void randomize_matrix();
 
 /* Player functions */
